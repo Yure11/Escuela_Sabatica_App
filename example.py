@@ -1,6 +1,8 @@
 import streamlit as st
 from multipage import save, MultiPage, start_app, clear_cache
 import base64
+import pandas as pd
+import numpy as np
 
 start_app() #Clears the cache when the app is started
 
@@ -50,6 +52,31 @@ def app2(prev_vars): #Second page
 
 def app3(prev_vars): #Third page
     st.subheader('Registro de Estudio')
+    st.write('Conteste las siguientes preguntas para llevar conteo de la leccion de esta semana.')
+    st.write('Gracias.')
+    st.subheader('Nombre')
+    st.text_input('',type='default')
+
+    st.subheader('Favor de marcar los dias que "SI" estudio')
+
+    domingo = st.checkbox('Domingo', False)
+    lunes = st.checkbox('Lunes', False)
+    martes = st.checkbox('Martes', False)
+    miercoles = st.checkbox('Miercoles', False)
+    jueves = st.checkbox('Jueves', False)
+    viernes = st.checkbox('Viernes', False)
+    sabado = st.checkbox('Sabado', False)
+
+    days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
+
+    df = pd.DataFrame({'Si/No':np.random.choice(['Si','No'], len(days))})
+    # df.index = df.index[:6].tolist() + days
+
+    st.bar_chart(df)
+
+    st.subheader('Llevando estudios biblicos?')
+    st.checkbox('Si')
+    st.checkbox('No')
 
 def app4(prev_vars):
     st.subheader('Pedidos de Oración')
