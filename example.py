@@ -5,13 +5,72 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
+
+# Data Base
+import sqlite3
+conn = sqlite3.connect('data.bd')
+c = conn.cursor()
+
+#Functions
+def create_pedidos_table():
+    c.execute('CREATE TABLE IF NOT EXISTS pedidostable(date DATE, pedido TEXT)')
+
+def create_anuncios_table():
+    c.execute('CREATE TABLE IF NOT EXISTS anunciostable(title Text, anuncio TEXT, date DATE)')
+
+def add_pedidos_data(date, pedido):
+    c.execute('INSERT INTO pedidostable(date, pedido) VALUES (?,?)', (date, pedido))
+    conn.commit()
+
+def add_anuncios_data(title, anuncio, date):
+    c.execute('INSERT INTO anunciostable(title, anuncio, date) VALUES (?,?,?)', (title, anuncio, date))
+    conn.commit()
+
+def view_all_pedidos():
+    c.execute('SELECT * FROM pedidostable')
+    data = c.fetchall()
+    return data
+
+def view_all_anuncios():
+    c.execute('SELECT * FROM anunciostable')
+    data = c.fetchall()
+    return data
+
+# Layout Templates
+anuncios_temp = """
+<div style="background-color:#1f90ff;padding:10px;border-radius:10px;margin:10px;">
+<h4 style="color:white;text-align:center;">{}</h1>
+<img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="vertical-align: middle;float:left;width: 50px;height: 50px;border-radius: 50%;" >
+<h6> <br/> {}</h6>
+<br/>
+<p style="color:gray;text-align:right;">{}</p>
+</div>
+"""
+
+pedido_temp = '''
+    <div style="background-color:#464e5f;padding:10px;border-radius:10px;margin:10px;">
+    <h4 style="color:white;text-align:left;></h1>
+    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="vertical-align: middle;float:left;width: 50px;height: 50px;border-radius: 50%;">
+    <h6 style="color:white;">{}</h6>
+    <p style="color:gray;text-align:right">{}</p>
+    </div>
+'''
+
 start_app() #Clears the cache when the app is started
 
 app = MultiPage()
 
 # Side Bar
-st.sidebar.image('logo.png')
-st.sidebar.write('140 6th Ave N, South St Paul, MN 55075')
+# st.sidebar.image('SSP Logo.png', width=150)
+sidebar_logo = """
+<p style="text-align:center;"><img src="https://drive.google.com/uc?id=1-z7Qusop31zf-E-UzTHMndxYRhezUAqB" alt="Logo" width="150"></p>
+<p style="text-align:center;">
+<a href="https://www.google.com/maps/place/140+6th+Ave+N,+South+St+Paul,+MN+55075/@44.8964291,-93.0577413,14.75z/data=!4m5!3m4!1s0x87f7d473b1b1f4fd:0x5ceaab1845d7cd9a!8m2!3d44.8917517!4d-93.0406702" target="_blank">140 6th Ave N, South St Paul, MN 55075</a><br>
+<a href="https://www.facebook.com/sspsda" target="_blank">Siguenos en Facebook</a><br>
+<a href="https://www.youtube.com/c/SouthStPaulSDA" target="_blank">Miranos en Youtube</a>
+</p>
+"""
+st.sidebar.markdown(sidebar_logo, unsafe_allow_html=True)
 st.sidebar.write(' ')
 app.navbar_name = "Paginas"
 
@@ -19,36 +78,33 @@ prev_vars = [1,0]
 
 
 # Pages
-def app1(prev_vars): #First page
+def main(prev_vars): #First page
     st.title('Iglesia Adventista de South St. Paul')
     st.subheader('Anuncios de esta semana')
+    create_anuncios_table()
+    anuncios = view_all_anuncios()
+    for i in anuncios:
+        a_title = i[0]
+        a_post = i[1]
+        a_date = i[2]
+        st.markdown(anuncios_temp.format(a_title, a_post, a_date), unsafe_allow_html=True)
 
+    date_today = datetime.today().strftime('%m/%d/%Y')
     st.markdown('''
-    ***
-    >**11/6/2021**
+    ---
 
-    >#### Bienvenidos a la pagina de la iglesia Adventista de South St Paul.
-
-    >###### Estamos contentos de que nos visites, en esta sencilla pagina encontraras información y recursos.
+    ##### Escriba su anuncio abajo y presione el boton para agregar a la lista
     ''')
+    anuncio_title = st.text_input('Titulo del Anuncio')
+    anuncio_post = st.text_area('Anuncio')
+    
+    if st.button('Agregar'):
+        add_anuncios_data(anuncio_title, anuncio_post, date_today)
+        st.success("Anuncio:{} agregado".format(date_today))
 
-    st.markdown('''
-    ***
-    >**11/7/2021**
 
-    >#### 12 de Diciembre Programa de Decimo Tercer Sabado, no faltes
-    ''')
 
-    st.markdown('''
-    ***
-    >**11/7/2021**
-
-    >#### Favor de tener paciencia mientras mejoramos nuestra pagina.
-
-    >###### Estamos trabajando en hacer cada vez mejor nuestra pagina web y estaremos añadiendo mas funcionalidad poco a poco.
-    ''')
-
-def app2(prev_vars): #Second page
+def lesson(prev_vars): #Second page
     st.title('Escuela Sabática')
     st.subheader('IV Trimestre - Lección de la Semana 6')
 
@@ -60,7 +116,7 @@ def app2(prev_vars): #Second page
     # Displaying File
         st.markdown(pdf_display, unsafe_allow_html=True)
 
-    # displayPDF("https://rebiblicos.s3.us-east-2.wasabisys.com/Escuela%20Sabatica/4to%202021/Adultos/_6.pdf")
+    # displayPDF("https://drive.google.com/uc?id=1GsjBovR4OrzPvtGBjxjX9hpvgG-j2MBq")
 
     st.markdown('''
     *** 
@@ -102,18 +158,30 @@ def app3(prev_vars): #Third page
     st.checkbox('Si')
     st.checkbox('No')
 
-def app4(prev_vars):
+def prayer(prev_vars):
     st.subheader('Pedidos de Oración')
+    create_pedidos_table()
+    pedidos = view_all_pedidos()
+    for i in pedidos:
+        p_post = i[1]
+        p_date = i[0]
+        st.markdown(pedido_temp.format(p_post, p_date), unsafe_allow_html=True)
 
-    date_today = datetime.today().strftime('%m-%d-%Y')
-    pedido_date = st.write('Fecha:', date_today)
-    pedido_post = st.text_area('Escriba su pedido abajo')
-    add_pedido = st.button('Agregar')
+    date_today = datetime.today().strftime('%m/%d/%Y')
+    st.markdown('''
+    ---
+
+    ##### Escriba su pedido abajo y presione el boton para agregar a la lista
+    ''')
+    pedido_post = st.text_area('')
+    if st.button('Agregar'):
+        add_pedidos_data(date_today, pedido_post)
+        st.success("Pedido:{} agregado".format(date_today))
     
 
 # app.set_initial_page(app1)
-app.add_app("Pagina Principal", app1) #Adds first page (app1) to the framework
-app.add_app("Escuela Sabatica", app2) #Adds second page (app2) to the framework
+app.add_app("Pagina Principal", main) #Adds first page (app1) to the framework
+app.add_app("Escuela Sabatica", lesson) #Adds second page (app2) to the framework
 app.add_app("Registro de Estudio", app3) #Adds third page (app3) to the framework
-app.add_app("Pedidos de Oración", app4)
+app.add_app("Pedidos de Oración", prayer)
 app.run() #Runs the multipage app!
