@@ -1,9 +1,11 @@
+from typing import Container
 import streamlit as st
 from multipage import save, MultiPage, start_app, clear_cache
 import base64
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import streamlit.components.v1 as components
 
 
 # Data Base
@@ -42,18 +44,17 @@ anuncios_temp = """
 <h4 style="color:white;text-align:center;">{}</h1>
 <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="vertical-align: middle;float:left;width: 50px;height: 50px;border-radius: 50%;" >
 <h6> <br/> {}</h6>
-<br/>
 <p style="color:gray;text-align:right;">{}</p>
 </div>
 """
 
 pedido_temp = '''
-    <div style="background-color:#464e5f;padding:10px;border-radius:10px;margin:10px;">
-    <h4 style="color:white;text-align:left;></h1>
-    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="vertical-align: middle;float:left;width: 50px;height: 50px;border-radius: 50%;">
-    <h6 style="color:white;">{}</h6>
-    <p style="color:gray;text-align:right">{}</p>
-    </div>
+<div style="background-color:#464e5f;padding:10px;border-radius:10px;margin:10px;">
+<h4 style="color:white;text-align:left;>{}</h1>
+<img src="https://drive.google.com/uc?id=1rWl-c1vVxyRZHx0mpOEloaV6kRdR9xBT.png" alt="Avatar" style="vertical-align: middle;float:left;width: 50px;height: 50px;border-radius: 50%;">
+<h6 style="color:white;">{}</h6>
+<p style="color:gray;text-align:right"></p>
+</div>
 '''
 
 start_app() #Clears the cache when the app is started
@@ -79,8 +80,13 @@ prev_vars = [1,0]
 
 # Pages
 def main(prev_vars): #First page
-    st.title('Iglesia Adventista de South St. Paul')
-    st.subheader('Anuncios de esta semana')
+
+    page_title = '''
+    <H1 style="font-family:Candara; color:#0000A5;">Iglesia Adventista de South St. Paul</h1>
+    '''
+    
+    st.markdown(page_title, unsafe_allow_html=True)
+    
     create_anuncios_table()
     anuncios = view_all_anuncios()
     for i in anuncios:
@@ -90,9 +96,19 @@ def main(prev_vars): #First page
         st.markdown(anuncios_temp.format(a_title, a_post, a_date), unsafe_allow_html=True)
 
     date_today = datetime.today().strftime('%m/%d/%Y')
-    st.markdown('''
-    ---
 
+    welcome_message = '''
+    <div style="background-color:#1f90ff;padding:10px;border-radius:10px;margin:10px;">
+    <h4 style="color:white;text-align:center;">Bienvenidos</h1>
+    <img src="https://drive.google.com/uc?id=1-z7Qusop31zf-E-UzTHMndxYRhezUAqB" alt="Avatar" style="vertical-align:middle;float:left;width: 50px;border-radius: 10%;" >
+    <h6> <br/>Esta es nuestra pagina de la Iglesia Adventista del Sur de San Pablo</h6>
+    <p style="color:gray;text-align:right;">11/3/2021</p>
+    </div>'''
+    st.markdown(welcome_message, unsafe_allow_html=True)
+    st.subheader('Anuncios de esta semana')
+    st.markdown('''
+
+    ---
     ##### Escriba su anuncio abajo y presione el boton para agregar a la lista
     ''')
     anuncio_title = st.text_input('Titulo del Anuncio')
@@ -120,7 +136,7 @@ def lesson(prev_vars): #Second page
 
     st.markdown('''
     *** 
-    #### Commentarios de la lección
+    #### Comentarios de la lección
     ''')
 
     st.text_area('')
@@ -179,29 +195,36 @@ def prayer(prev_vars):
         st.success("Pedido:{} agregado".format(date_today))
 
 def admin(prev_vars):
-    st.subheader('Log In')
 
-    username = st.text_input("Please input your username:")
-    passwd = st.text_input("Please input your password",type='password')
+    inputs = st.empty()
+    with inputs.container():
+        st.subheader('Log In')
+        st.write('Solo para administradores de la pagina')
+        username = st.text_input("Please input your username:")
+        passwd = st.text_input("Please input your password",type='password')
 
-    st.subheader('Page Admin')
-    # def pwd():
-    #     admin = "Admin"
-    #     password = "sspsda"
-    #     c.execute('CREATE TABLE IF NOT EXISTS pwd(users TEXT, password TEXT)')
-    #     c.execute('INSERT INTO pwd(users, password) VALUES (?,?)', (admin, password))
-    # pwd()
-    # c.execute('SELECT * FROM pwd')
-    # data = c.fetchall()
-
-    if username=="":
-        st.info("You do not have input user name yet")
-    elif passwd=="":
-        st.info("You do not have input password yet")
-    else:
-        if username == st.secrets["DB_USERNAME"] and passwd == st.secrets["DB_PASSWORD"]:
+    if username == st.secrets["DB_USERNAME"] and passwd == st.secrets["DB_PASSWORD"]:
+            inputs.empty()
+            st.subheader('Admin Settings')
             st.success("Welcome back！")
-            st.subheader('Page Admin')
+            st.markdown("""
+            ---
+
+            #### Anuncios
+            """)
+            st.markdown("""
+            ---
+            
+            #### Comentarios de la lección
+            """)
+            st.markdown("""
+            ---
+
+            #### Pedidos
+            """)
+    else:
+        st.info("Username and/or password are incorrect")
+
 
 # app.set_initial_page(app1)
 app.add_app("Pagina Principal", main) #Adds first page (app1) to the framework
