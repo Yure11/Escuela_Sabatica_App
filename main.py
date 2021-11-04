@@ -181,28 +181,31 @@ def prayer(prev_vars):
 def admin(prev_vars):
     st.subheader('Log In')
 
-    def pwd():
-        admin = "Admin"
-        password = "sspsda"
-        c.execute('CREATE TABLE IF NOT EXISTS pwd(users TEXT, password TEXT)')
-        c.execute('INSERT INTO pwd(users, password) VALUES (?,?)', (admin, password))
+    st.write("DB username:", st.secrets["DB_USERNAME"])
+    st.write("DB password:", st.secrets["DB_PASSWORD"])
+    st.subheader('Page Admin')
+    # def pwd():
+    #     admin = "Admin"
+    #     password = "sspsda"
+    #     c.execute('CREATE TABLE IF NOT EXISTS pwd(users TEXT, password TEXT)')
+    #     c.execute('INSERT INTO pwd(users, password) VALUES (?,?)', (admin, password))
 
 
-    username=st.text_input("Please input your username:")
-    passwd=st.text_input("Please input your password",type='password')
+    # username=st.text_input("Please input your username:")
+    # passwd=st.text_input("Please input your password",type='password')
 
-    pwd()
-    c.execute('SELECT * FROM pwd')
-    data = c.fetchall()
+    # pwd()
+    # c.execute('SELECT * FROM pwd')
+    # data = c.fetchall()
 
-    if username=="":
-        st.info("You do not have input user name yet")
-    elif pwd=="":
-        st.info("You do not have input password yet")
-    else:
-        if username in data.values and passwd in data.values:
-            st.success("Welcome back！")
-            st.subheader('Page Admin')
+    # if username=="":
+    #     st.info("You do not have input user name yet")
+    # elif pwd=="":
+    #     st.info("You do not have input password yet")
+    # else:
+    #     if username in data.values and passwd in data.values:
+    #         st.success("Welcome back！")
+    #         st.subheader('Page Admin')
 
 # app.set_initial_page(app1)
 app.add_app("Pagina Principal", main) #Adds first page (app1) to the framework
