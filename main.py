@@ -181,10 +181,10 @@ def prayer(prev_vars):
 def admin(prev_vars):
     st.subheader('Log In')
 
-    username=st.text_input("Please input your username:")
-    passwd=st.text_input("Please input your password",type='password')
+    username = st.text_input("Please input your username:")
+    passwd = st.text_input("Please input your password",type='password')
 
-        st.subheader('Page Admin')
+    st.subheader('Page Admin')
     # def pwd():
     #     admin = "Admin"
     #     password = "sspsda"
@@ -196,7 +196,7 @@ def admin(prev_vars):
 
     if username=="":
         st.info("You do not have input user name yet")
-    elif pwd=="":
+    elif passwd=="":
         st.info("You do not have input password yet")
     else:
         if username == st.secrets["DB_USERNAME"] and passwd == st.secrets["DB_PASSWORD"]:
