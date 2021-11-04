@@ -109,7 +109,7 @@ def lesson(prev_vars): #Second page
     st.subheader('IV Trimestre - Lección de la Semana 6')
 
     # Opening file from file path
-    with open("leccion 6.pdf", "rb") as f:
+    with open("leccion.pdf", "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode('utf-8')
     # Embedding PDF in HTML
         pdf_display = F'<embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf">'
